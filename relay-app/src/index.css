@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-manabi-navy: #2D4A6F;
+  --color-manabi-sky: #5BC0DE;
+  --color-manabi-teal: #00B4B4;
+  --color-manabi-tealHover: #009696;
+  --color-manabi-orange: #FF6B35;
+  --color-manabi-bg: #F5F5F5;
+  --color-manabi-card: #FFFFFF;
+
+  --radius-card: 12px;
+}
+
+/* Custom Utilities for huge buttons etc (if needed, but standard logic prefers utility classes) */
+.btn-huge {
+  @apply w-full py-6 text-2xl font-bold rounded-2xl shadow-lg active:scale-95 transition-transform;
+}
+
+/* Base styles */
+body {
+  @apply bg-slate-50 text-slate-900 touch-manipulation;
+  background-color: var(--color-manabi-bg);
+}
