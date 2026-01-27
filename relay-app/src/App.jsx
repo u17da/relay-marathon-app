@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, RotateCcw, Flag, Clock, Users, ChevronRight, Activity, Award, Undo2, Settings, ArrowLeft, Check, RefreshCw, Anchor, Ship, Waves, Sparkles, PartyPopper, Sun, Zap } from 'lucide-react';
+import { Play, Pause, RotateCcw, Flag, Clock, Users, ChevronRight, Activity, Award, Undo2, Settings, ArrowLeft, Check, RefreshCw, Anchor, Ship, Waves, Sparkles, PartyPopper, Sun, Zap, Rabbit } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import runnerList from './runner_list.json';
@@ -12,6 +12,49 @@ function cn(...inputs) {
 const TOTAL_LAPS = 30;
 const TARGET_LAP_TIME_SEC = 8 * 60; // 1周8分
 const LAP_DISTANCE_KM = 42.195 / 30; // approx 1.4065
+
+// --- ANIMATION STYLES ---
+const AnimationStyles = () => (
+  <style>{`
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
+    }
+    @keyframes sail {
+      0% { transform: translateX(-100vw); }
+      100% { transform: translateX(100vw); }
+    }
+    @keyframes wave {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes gal-spin {
+      0% { transform: rotate(0deg) scale(0.5); }
+      50% { transform: rotate(180deg) scale(1.5); }
+      100% { transform: rotate(360deg) scale(0.5); }
+    }
+    @keyframes rainbow-bg {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes text-pop {
+      0% { transform: scale(0); opacity: 0; }
+      80% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-bob { animation: bob 2s ease-in-out infinite; }
+    .animate-sail { animation: sail 3s linear forwards; }
+    .animate-wave { animation: wave 10s linear infinite; }
+    .animate-gal-spin { animation: gal-spin 1s linear infinite; }
+    .animate-rainbow { 
+      background: linear-gradient(45deg, #ff00cc, #333399, #00ffff, #ffcc00);
+      background-size: 400% 400%;
+      animation: rainbow-bg 0.5s ease infinite;
+    }
+    .animate-text-pop { animation: text-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+  `}</style>
+);
 
 // --- COMPONENTS ---
 
@@ -127,9 +170,100 @@ function PasswordDialog({ isOpen, title, onConfirm, onCancel }) {
   );
 }
 
+// --- TRANSITIONS ---
+
+function TransitionOverlay({ teamId, onComplete }) {
+  useEffect(() => {
+    const timer = setTimeout(onComplete, 3500);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  if (teamId === 'ota') {
+    return (
+      <div className="fixed inset-0 z-[200] bg-sky-100 flex flex-col items-center justify-center overflow-hidden">
+        <AnimationStyles />
+        <div className="absolute inset-0 bg-blue-400/10"></div>
+        {/* Sky Elements */}
+        <div className="absolute top-20 right-20 text-yellow-400 animate-pulse">
+          <Sun size={80} />
+        </div>
+
+        {/* Main Ship */}
+        <div className="relative z-10 animate-sail w-full max-w-4xl">
+          <div className="flex flex-col items-center">
+            <div className="text-manabi-navy font-black text-4xl mb-4 bg-white/80 backdrop-blur px-8 py-4 rounded-full shadow-lg whitespace-nowrap">
+              太田ヨットスクール、出航！！
+            </div>
+            <div className="text-manabi-navy drop-shadow-2xl animate-bob">
+              <Ship size={200} fill="currentColor" className="text-manabi-navy" />
+            </div>
+          </div>
+        </div>
+
+        {/* Waves */}
+        <div className="absolute bottom-0 left-0 w-[200%] h-48 flex items-end animate-wave text-blue-500/30">
+          <Waves size={200} className="w-full h-full scale-[2]" />
+        </div>
+        <div className="absolute bottom-0 left-0 w-[200%] h-32 flex items-end animate-wave text-blue-600/30" style={{ animationDuration: '7s' }}>
+          <Waves size={200} className="w-full h-full scale-[2]" />
+        </div>
+      </div>
+    );
+  }
+
+  if (teamId === 'surfing') {
+    return (
+      <div className="fixed inset-0 z-[200] animate-rainbow flex flex-col items-center justify-center overflow-hidden">
+        <AnimationStyles />
+
+        <div className="absolute inset-0 flex items-center justify-center opacity-20">
+          <div className="animate-gal-spin duration-3000">
+            <Sun size={600} className="text-white" />
+          </div>
+        </div>
+
+        <div className="relative z-10 text-center space-y-8">
+          <div className="flex justify-center gap-4">
+            <div className="animate-bounce delay-0"><Sparkles size={64} className="text-yellow-300" /></div>
+            <div className="animate-bounce delay-100"><PartyPopper size={64} className="text-pink-300" /></div>
+            <div className="animate-bounce delay-200"><Zap size={64} className="text-cyan-300" /></div>
+          </div>
+
+          <div className="animate-text-pop transform transition-all">
+            <h1 className="text-6xl md:text-8xl font-black text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)] stroke-black" style={{ WebkitTextStroke: '2px black' }}>
+              バイブス<br />ぶち上げ!!!
+            </h1>
+          </div>
+
+          <div className="text-2xl font-bold text-white bg-black/30 backdrop-blur-md px-6 py-2 rounded-full inline-block animate-pulse">
+            徳永ぶちｱｹﾞ♂Surfing☆スクール
+          </div>
+        </div>
+
+        {/* Floating text */}
+        <div className="absolute top-1/4 left-10 text-4xl font-bold text-white -rotate-12 animate-text-pop" style={{ animationDelay: '0.5s' }}>
+          ⤴︎AGE⤴︎
+        </div>
+        <div className="absolute bottom-1/4 right-10 text-4xl font-bold text-white rotate-12 animate-text-pop" style={{ animationDelay: '0.8s' }}>
+          最強！！
+        </div>
+      </div>
+    );
+  }
+
+  // Default fallback transition
+  return (
+    <div className="fixed inset-0 z-[200] bg-white flex items-center justify-center">
+      <div className="animate-spin text-manabi-teal">
+        <RefreshCw size={64} />
+      </div>
+    </div>
+  );
+}
+
 // --- SCREENS ---
 
-function LandingScreen() {
+function LandingScreen({ onSelectTeam }) {
   return (
     <div className="min-h-screen bg-manabi-bg flex flex-col items-center justify-center p-6 space-y-10 animate-in fade-in duration-700">
       <div className="text-center space-y-3">
@@ -144,10 +278,10 @@ function LandingScreen() {
           if (team.id === 'ota') {
             // 太田ヨットスクール (Marine/Yacht Design)
             return (
-              <a
+              <button
                 key={team.id}
-                href={`?team=${team.id}`}
-                className="group relative overflow-hidden bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 block border-4 border-transparent hover:border-manabi-navy/20"
+                onClick={() => onSelectTeam(team.id)}
+                className="group relative overflow-hidden bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 block border-4 border-transparent hover:border-manabi-navy/20 w-full text-left"
               >
                 {/* Marine Background & Decoration */}
                 <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_20px,#f0f9ff_20px,#f0f9ff_40px)] opacity-60"></div>
@@ -193,20 +327,20 @@ function LandingScreen() {
                     </div>
                   </div>
                 </div>
-              </a>
+              </button>
             );
           } else if (team.id === 'surfing') {
             // 徳永ぶちｱｹﾞ♂Surfing☆スクール (Gal/Gyaru Design)
             return (
-              <a
+              <button
                 key={team.id}
-                href={`?team=${team.id}`}
-                className="group relative overflow-hidden bg-gradient-to-br from-[#FF00CC] via-[#333399] to-[#493240] rounded-3xl shadow-xl hover:shadow-[0_20px_50px_rgba(255,0,204,0.3)] transition-all duration-300 hover:-translate-y-1 block ring-4 ring-transparent hover:ring-pink-400/50"
+                onClick={() => onSelectTeam(team.id)}
+                className="group relative overflow-hidden bg-gradient-to-br from-[#FF00CC] via-[#333399] to-[#493240] rounded-3xl shadow-xl hover:shadow-[0_20px_50px_rgba(255,0,204,0.3)] transition-all duration-300 hover:-translate-y-1 block ring-4 ring-transparent hover:ring-pink-400/50 w-full text-left"
               >
                 {/* Gal Background & Decoration */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.2),transparent_70%)]"></div>
 
-                {/* Glitter effect dots using generic spans or pseudo elements could be complex, keeping simple with SVG icons */}
+                {/* Glitter effect dots */}
                 <div className="absolute -left-4 top-10 text-pink-300/20 -rotate-12 animate-pulse">
                   <Sparkles size={100} />
                 </div>
@@ -252,16 +386,16 @@ function LandingScreen() {
                     </div>
                   </div>
                 </div>
-              </a>
+              </button>
             );
           }
 
           // Default Fallback
           return (
-            <a
+            <button
               key={team.id}
-              href={`?team=${team.id}`}
-              className="group block bg-white border border-slate-200 hover:border-manabi-sky rounded-xl p-6 shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+              onClick={() => onSelectTeam(team.id)}
+              className="group block bg-white border border-slate-200 hover:border-manabi-sky rounded-xl p-6 shadow-sm hover:shadow-md transition-all active:scale-[0.98] w-full text-left"
             >
               <div className="flex items-center justify-between">
                 <span className="font-bold text-lg text-manabi-navy group-hover:text-manabi-teal transition-colors">{team.teamName}</span>
@@ -270,7 +404,7 @@ function LandingScreen() {
               <div className="text-xs text-slate-500 mt-2 font-medium">
                 メンバー {team.members.length}名
               </div>
-            </a>
+            </button>
           );
         })}
       </div>
@@ -583,9 +717,9 @@ function RaceScreen({ data, onUpdate, onRequestReset, onRequestUndo }) {
           </div>
 
           <div className="px-2 pt-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">履歴 (直近3件)</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">履歴</h3>
             <div className="space-y-2">
-              {[...laps].reverse().slice(0, 3).map((lap) => (
+              {[...laps].reverse().map((lap) => (
                 <div key={lap.lap} className="flex items-center justify-between text-sm py-2 border-b border-slate-200 last:border-0 pl-1 pr-1">
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-manabi-sky text-xs font-bold">#{lap.lap}</span>
@@ -623,6 +757,16 @@ function ResultScreen({ data, onRequestReset }) {
     return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  // Calculate ranks
+  const sortedLaps = [...laps].sort((a, b) => a.duration - b.duration);
+  const rankMap = new Map();
+  sortedLaps.forEach((lap, index) => {
+    // Only rank top 3
+    if (index < 3) {
+      rankMap.set(lap.lap, index + 1);
+    }
+  });
+
   return (
     <div className="min-h-screen bg-manabi-navy text-white p-8 flex flex-col items-center justify-center space-y-8 animate-in zoom-in duration-500">
       <div className="text-center space-y-4">
@@ -636,13 +780,29 @@ function ResultScreen({ data, onRequestReset }) {
       </div>
 
       <div className="w-full max-w-sm">
+        <h3 className="text-xs font-bold text-white/50 mb-2 uppercase tracking-widest">全ラップ記録</h3>
         <div className="bg-white/5 rounded-2xl p-4 max-h-60 overflow-y-auto space-y-2 backdrop-blur-sm border border-white/10">
-          {laps.map((lap) => (
-            <div key={lap.lap} className="flex justify-between text-sm py-1 border-b border-white/5 last:border-0">
-              <span className="text-white/80 font-medium">#{lap.lap} {lap.runnerName}</span>
-              <span className="font-mono text-white/60">{Math.floor(lap.duration / 60)}:{(Math.floor(lap.duration) % 60).toString().padStart(2, '0')}</span>
-            </div>
-          ))}
+          {laps.map((lap) => {
+            const rank = rankMap.get(lap.lap);
+            return (
+              <div key={lap.lap} className="flex justify-between items-center text-sm py-1 border-b border-white/5 last:border-0 relative">
+                <div className="flex items-center gap-2">
+                  <span className="text-white/80 font-medium">#{lap.lap} {lap.runnerName}</span>
+                  {rank && (
+                    <div className={cn(
+                      "flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold border",
+                      rank === 1 ? "bg-yellow-500/20 text-yellow-300 border-yellow-500/50" :
+                        rank === 2 ? "bg-slate-300/20 text-slate-300 border-slate-300/50" :
+                          "bg-orange-700/20 text-orange-300 border-orange-700/50"
+                    )}>
+                      <Rabbit size={10} strokeWidth={3} /> {rank}
+                    </div>
+                  )}
+                </div>
+                <span className="font-mono text-white/60">{Math.floor(lap.duration / 60)}:{(Math.floor(lap.duration) % 60).toString().padStart(2, '0')}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -656,17 +816,26 @@ function ResultScreen({ data, onRequestReset }) {
 // --- APP ROOT ---
 
 function App() {
-  const queryParams = new URLSearchParams(window.location.search);
-  const teamId = queryParams.get('team');
+  const [teamId, setTeamId] = useState(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    return queryParams.get('team');
+  });
+
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionTeamId, setTransitionTeamId] = useState(null);
+
   const presetTeam = runnerList.find(t => t.id === teamId);
   const storageKey = teamId ? `relay-app-data-${teamId}` : 'relay-app-data-default';
 
   const [data, setData] = useState(() => {
+    // teamIdが無い場合はnull
+    if (!teamId) return null;
     const saved = localStorage.getItem(storageKey);
     return saved ? JSON.parse(saved) : null;
   });
 
   const [phase, setPhase] = useState(() => {
+    if (!teamId) return 'landing'; // 'landing' phase added
     if (!data) return 'setup';
     if (data.laps.length >= TOTAL_LAPS) return 'finish';
     return 'race';
@@ -674,16 +843,45 @@ function App() {
 
   const [modalMode, setModalMode] = useState(null); // 'password' | 'confirm' | 'undo' | null
 
+  // teamIdが変わったらdataも読み直す
   useEffect(() => {
-    if (data) {
+    if (teamId) {
+      const key = `relay-app-data-${teamId}`;
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        setData(JSON.parse(saved));
+        setPhase(JSON.parse(saved).laps.length >= TOTAL_LAPS ? 'finish' : 'race');
+      } else {
+        setData(null);
+        setPhase('setup');
+      }
+    }
+  }, [teamId]);
+
+  useEffect(() => {
+    if (data && teamId) { // teamIdがあるときのみ保存
       localStorage.setItem(storageKey, JSON.stringify(data));
       if (data.laps.length >= TOTAL_LAPS) {
         setPhase('finish');
       }
-    } else {
+    } else if (teamId && !data) {
+      // dataがnullになったら消去 (reset時など)
       localStorage.removeItem(storageKey);
     }
-  }, [data, storageKey]);
+  }, [data, storageKey, teamId]);
+
+  const handleSelectTeam = (id) => {
+    setTransitionTeamId(id);
+    setIsTransitioning(true);
+    // URLを更新するが、リロードはしない
+    window.history.pushState({}, '', `?team=${id}`);
+  };
+
+  const handleTransitionComplete = () => {
+    setIsTransitioning(false);
+    setTeamId(transitionTeamId);
+    // teamIdが変わることで useEffectが走り、phaseがsetupになる
+  };
 
   const handleStart = (setupData) => {
     setData({
@@ -736,7 +934,13 @@ function App() {
     }
   };
 
-  if (!teamId) return <LandingScreen />;
+  // 遷移中アニメーション
+  if (isTransitioning) {
+    return <TransitionOverlay teamId={transitionTeamId} onComplete={handleTransitionComplete} />;
+  }
+
+  // チーム未選択時はLanding
+  if (!teamId) return <LandingScreen onSelectTeam={handleSelectTeam} />;
 
   const currentDisplayData = data || (presetTeam ? {
     teamName: presetTeam.teamName,
