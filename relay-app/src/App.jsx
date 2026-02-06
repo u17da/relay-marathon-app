@@ -126,7 +126,7 @@ function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel }) {
   );
 }
 
-function PasswordDialog({ isOpen, title, onConfirm, onCancel }) {
+function PasswordDialog({ isOpen, title, message, onConfirm, onCancel }) {
   const [pass, setPass] = useState('');
 
   if (!isOpen) return null;
@@ -139,14 +139,15 @@ function PasswordDialog({ isOpen, title, onConfirm, onCancel }) {
   return (
     <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
-        <div className="p-6">
-          <h3 className="text-xl font-bold text-manabi-navy mb-4">{title}</h3>
+        <div className="p-6 space-y-3">
+          <h3 className="text-xl font-bold text-manabi-navy">{title}</h3>
+          {message && <p className="text-sm text-slate-500 font-medium leading-relaxed">{message}</p>}
           <input
-            type="password"
+            type="text"
             autoFocus
             value={pass}
             onChange={(e) => setPass(e.target.value)}
-            placeholder="パスフレーズを入力"
+            placeholder="ここに指定の文字を入力"
             className="w-full p-3 rounded-lg border-2 border-slate-200 focus:border-manabi-teal focus:outline-none text-lg font-bold"
           />
         </div>
@@ -977,6 +978,7 @@ function App() {
       <PasswordDialog
         isOpen={modalMode === 'password'}
         title="リセットしますか？"
+        message="タイムがリセットされて最初からになります。本当によろしいですか。よろしい場合はsmedと入力して実行することでリセットされます。"
         onConfirm={handlePasswordConfirm}
         onCancel={() => setModalMode(null)}
       />
